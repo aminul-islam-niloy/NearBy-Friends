@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NearBy_Friends.Data;
@@ -11,8 +12,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddControllersWithViews();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders(); // Add this line to ensure default token providers are configured
 
 // Inject IConfiguration
 var configuration = builder.Configuration;
@@ -22,7 +23,43 @@ builder.Services.AddAuthentication()
     {
         options.ClientId = configuration["Authentication:Google:ClientId"];
         options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+
+        // Customize user creation during Google authentication
+        options.Events = new OAuthEvents
+        {
+            OnCreatingTicket = async context =>
+            {
+                // Extract email from the authentication context
+                var email = context.User.GetProperty("email").GetString();
+
+                // Retrieve user manager
+                var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
+
+                // Check if the user exists
+                var existingUser = await userManager.FindByEmailAsync(email);
+
+                // If the user doesn't exist, create a new user and assign the "Customer" role
+                if (existingUser == null)
+                {
+                    var newUser = new IdentityUser { UserName = email, Email = email };
+                    var result = await userManager.CreateAsync(newUser);
+
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(newUser, "Customer");
+                    }
+                }
+            }
+        };
     });
+
+
+
+
+
+
+builder.Services.AddControllersWithViews();
+
 
 
 var app = builder.Build();
