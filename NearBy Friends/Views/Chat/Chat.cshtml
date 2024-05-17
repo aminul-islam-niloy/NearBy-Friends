@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Chat";
+}
+
+<h1>Chat</h1>
+
+<select id="friendList"></select>
+<input type="text" id="messageInput" />
+<button id="sendButton">Send</button>
+
+@section Scripts {
+    <script src="~/lib/signalr/signalr.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+
+        connection.on("ReceiveMessage", function (sender, receiver, message) {
+            // Check if the message is meant for the current user
+            if (receiver === '@User.Identity.Name') {
+                const msg = document.createElement("div");
+                msg.textContent = sender + ": " + message;
+                document.getElementById("messagesList").appendChild(msg);
+
+                // Play notification sound
+                var audio = new Audio('notification.mp3');
+                audio.play();
+
+                // Show browser notification
+                if (Notification.permission === "granted") {
+                    new Notification(sender, { body: message });
+                }
+            }
+        });
+
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        document.getElementById("sendButton").addEventListener("click", function (event) {
+            const receiver = document.getElementById("friendList").value;
+            const message = document.getElementById("messageInput").value;
+            const sender = '@User.Identity.Name'; // Assuming you have this information
+            connection.invoke("SendMessage", sender, receiver, message).catch(function (err) {
+                return console.error(err.toString());
+            });
+            event.preventDefault();
+        });
+
+        // Request permission for notifications
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        // Fetch friends list and populate the dropdown
+        fetch('/Friend/GetFriends')
+            .then(response => response.json())
+            .then(data => {
+                const friendList = document.getElementById("friendList");
+                data.forEach(friend => {
+                    const option = document.createElement("option");
+                    option.value = friend.id;
+                    option.text = friend.name;
+                    friendList.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching friends:', error));
+    </script>
+}

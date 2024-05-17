@@ -13,5 +13,6 @@ namespace NearBy_Friends.Data
 
         public DbSet<Friend> Friends { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<Message> Messages { get; set; }
     }
 }
