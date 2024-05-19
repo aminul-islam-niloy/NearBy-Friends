@@ -14,5 +14,13 @@ namespace NearBy_Friends.Data
         public DbSet<Friend> Friends { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Message> Messages { get; set; }
+
+        public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<ChatRoom> ChatRooms { get; set; }
+        public DbSet<UserStatus> UserStatus { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+
+
     }
 }
