@@ -49,3 +49,9 @@ body {
         height: 300px;
     }
 }
+.badge-danger {
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 0.5em;
+}
