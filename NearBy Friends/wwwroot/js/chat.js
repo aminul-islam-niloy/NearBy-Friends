@@ -1,31 +1,4 @@
-﻿//"use strict";
-
-//const connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
-
-//// Disable send button until connection is established
-//document.getElementById("sendButton").disabled = true;
-
-//connection.on("ReceiveMessage", function (user, message) {
-//    const li = document.createElement("li");
-//    li.textContent = `${user}: ${message}`;
-//    document.getElementById("messageList").appendChild(li);
-//});
-
-//connection.start().then(function () {
-//    document.getElementById("sendButton").disabled = false;
-//}).catch(function (err) {
-//    return console.error(err.toString());
-//});
-
-//document.getElementById("sendButton").addEventListener("click", function (event) {
-//    const user = document.getElementById("UserInput").value;
-//    const message = document.getElementById("messegeInput").value;
-//    connection.invoke("SendMessage", user, message).catch(function (err) {
-//        return console.error(err.toString());
-//    });
-//    event.preventDefault();
-//});
-
+﻿
 
 "use strict";
 
